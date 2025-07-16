@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartPark - Parking Slot Booking System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loading" class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading SmartPark...</p>
+    </div>
+
+    <!-- Login Page -->
+    <div id="loginPage" class="page active">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <h1><i class="fas fa-parking"></i> SmartPark</h1>
+                    <p>Your Smart Parking Solution</p>
+                </div>
+                
+                <div class="login-tabs">
+                    <button class="tab-btn active" onclick="switchTab('user')">User Login</button>
+                    <button class="tab-btn" onclick="switchTab('admin')">Admin Login</button>
+                </div>
+
+                <!-- User Login Form -->
+                <div id="userLogin" class="login-form">
+                    <form id="userLoginForm">
+                        <div class="input-group">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="userEmail" placeholder="Email Address" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="userPassword" placeholder="Password" required>
+                            <span class="toggle-password" onclick="togglePassword('userPassword')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="login-options">
+                            <label class="remember-me">
+                                <input type="checkbox" id="rememberMe">
+                                <span>Remember me</span>
+                            </label>
+                            <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                        </div>
+                        <button type="submit" class="login-btn">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </button>
+                    </form>
+
+                    <!-- Google Login -->
+                    <div class="social-login">
+                        <div class="divider">
+                            <span>OR</span>
+                        </div>
+                        <div id="g_id_onload"
+                             data-client_id="YOUR_GOOGLE_CLIENT_ID"
+                             data-callback="handleGoogleLogin">
+                        </div>
+                        <div class="g_id_signin" data-type="standard"></div>
+                        <button class="google-btn" onclick="loginWithGoogle()">
+                            <i class="fab fa-google"></i> Continue with Google
+                        </button>
+                    </div>
+
+                    <div class="signup-link">
+                        <p>Don't have an account? <a href="#" onclick="showSignup()">Sign up here</a></p>
+                    </div>
+                </div>
+
+                <!-- Admin Login Form -->
+                <div id="adminLogin" class="login-form hidden">
+                    <form id="adminLoginForm">
+                        <div class="input-group">
+                            <i class="fas fa-user-shield"></i>
+                            <input type="text" id="adminUsername" placeholder="Admin Username" required>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="adminPassword" placeholder="Admin Password" required>
+                            <span class="toggle-password" onclick="togglePassword('adminPassword')">
+                                <i class="fas fa-eye"></i>
+                            </span>
+                        </div>
+                        <div class="input-group">
+                            <i class="fas fa-shield-alt"></i>
+                            <input type="text" id="adminCode" placeholder="Security Code" required>
+                        </div>
+                        <button type="submit" class="login-btn admin-btn">
+                            <i class="fas fa-shield-alt"></i> Admin Login
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div id="signupModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeSignup()">&times;</span>
+            <h2>Create Account</h2>
+            <form id="signupForm">
+                <div class="input-group">
+                    <i class="fas fa-user"></i>
+                    <input type="text" id="signupName" placeholder="Full Name" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="signupEmail" placeholder="Email Address" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-phone"></i>
+                    <input type="tel" id="signupPhone" placeholder="Phone Number" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="signupPassword" placeholder="Password" required>
+                </div>
+                <div class="input-group">
+                    <i class="fas fa-lock"></i>
+                    <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                </div>
+                <button type="submit" class="login-btn">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Dashboard -->
+    <div id="userDashboard" class="page">
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-parking"></i> SmartPark
+            </div>
+            <div class="nav-menu">
+                <a href="#" onclick="showSection('dashboard')" class="nav-link active">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+                <a href="#" onclick="showSection('booking')" class="nav-link">
+                    <i class="fas fa-calendar-plus"></i> Book Slot
+                </a>
+                <a href="#" onclick="showSection('tickets')" class="nav-link">
+                    <i class="fas fa-ticket-alt"></i> My Tickets
+                </a>
+                <a href="#" onclick="showSection('profile')" class="nav-link">
+                    <i class="fas fa-user"></i> Profile
+                </a>
+                <a href="#" onclick="logout()" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <div class="dashboard-container">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="section active">
+                <div class="welcome-card">
+                    <h2>Welcome back, <span id="userName"></span>!</h2>
+                    <p>Manage your parking bookings efficiently</p>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <i class="fas fa-ticket-alt"></i>
+                        <h3 id="totalBookings">0</h3>
+                        <p>Total Bookings</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clock"></i>
+                        <h3 id="activeBookings">0</h3>
+                        <p>Active Bookings</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <h3 id="totalSpent">$0</h3>
+                        <p>Total Spent</p>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-car"></i>
+                        <h3 id="availableSlots">25</h3>
+                        <p>Available Slots</p>
+                    </div>
+                </div>
+
+                <div class="recent-bookings">
+                    <h3>Recent Bookings</h3>
+                    <div id="recentBookingsList" class="bookings-list"></div>
+                </div>
+            </div>
+
+            <!-- Booking Section -->
+            <div id="booking" class="section">
+                <div class="booking-header">
+                    <h2>Book a Parking Slot</h2>
+                    <p>Choose your preferred parking slot and time</p>
+                </div>
+
+                <div class="booking-form-container">
+                    <form id="bookingForm" class="booking-form">
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Vehicle Type</label>
+                                <select id="vehicleType" required>
+                                    <option value="">Select Vehicle</option>
+                                    <option value="car">Car</option>
+                                    <option value="motorcycle">Motorcycle</option>
+                                    <option value="truck">Truck</option>
+                                    <option value="suv">SUV</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Vehicle Number</label>
+                                <input type="text" id="vehicleNumber" placeholder="Enter vehicle number" required>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Date</label>
+                                <input type="date" id="bookingDate" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Time Slot</label>
+                                <select id="timeSlot" required>
+                                    <option value="">Select Time</option>
+                                    <option value="08:00-10:00">8:00 AM - 10:00 AM</option>
+                                    <option value="10:00-12:00">10:00 AM - 12:00 PM</option>
+                                    <option value="12:00-14:00">12:00 PM - 2:00 PM</option>
+                                    <option value="14:00-16:00">2:00 PM - 4:00 PM</option>
+                                    <option value="16:00-18:00">4:00 PM - 6:00 PM</option>
+                                    <option value="18:00-20:00">6:00 PM - 8:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="input-group">
+                                <label>Duration (hours)</label>
+                                <select id="duration" required>
+                                    <option value="">Select Duration</option>
+                                    <option value="1">1 Hour - $5</option>
+                                    <option value="2">2 Hours - $9</option>
+                                    <option value="4">4 Hours - $16</option>
+                                    <option value="8">8 Hours - $30</option>
+                                    <option value="24">Full Day - $50</option>
+                                </select>
+                            </div>
+                            <div class="input-group">
+                                <label>Parking Zone</label>
+                                <select id="parkingZone" required>
+                                    <option value="">Select Zone</option>
+                                    <option value="zone-a">Zone A (Premium) - +$5</option>
+                                    <option value="zone-b">Zone B (Standard)</option>
+                                    <option value="zone-c">Zone C (Economy) - -$2</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="slot-selection">
+                            <h3>Available Slots</h3>
+                            <div id="slotGrid" class="slot-grid"></div>
+                        </div>
+
+                        <div class="booking-summary">
+                            <h3>Booking Summary</h3>
+                            <div class="summary-details">
+                                <div class="summary-row">
+                                    <span>Base Price:</span>
+                                    <span id="basePrice">$0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Zone Fee:</span>
+                                    <span id="zoneFee">$0</span>
+                                </div>
+                                <div class="summary-row">
+                                    <span>Tax (10%):</span>
+                                    <span id="tax">$0</span>
+                                </div>
+                                <div class="summary-row total">
+                                    <span>Total Amount:</span>
+                                    <span id="totalAmount">$0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="book-btn">
+                            <i class="fas fa-credit-card"></i> Proceed to Payment
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Payment Modal -->
+            <div id="paymentModal" class="modal">
+                <div class="modal-content payment-modal">
+                    <span class="close" onclick="closePayment()">&times;</span>
+                    <h2>Payment Details</h2>
+                    <div class="payment-summary">
+                        <h3>Booking Summary</h3>
+                        <div id="paymentSummary"></div>
+                    </div>
+                    <form id="paymentForm">
+                        <div class="payment-methods">
+                            <h3>Payment Method</h3>
+                            <div class="payment-options">
+                                <label class="payment-option">
+                                    <input type="radio" name="paymentMethod" value="card" checked>
+                                    <span><i class="fas fa-credit-card"></i> Credit/Debit Card</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="paymentMethod" value="paypal">
+                                    <span><i class="fab fa-paypal"></i> PayPal</span>
+                                </label>
+                                <label class="payment-option">
+                                    <input type="radio" name="paymentMethod" value="wallet">
+                                    <span><i class="fas fa-wallet"></i> Digital Wallet</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="cardDetails" class="payment-details">
+                            <div class="input-group">
+                                <label>Card Number</label>
+                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" maxlength="19">
+                            </div>
+                            <div class="form-row">
+                                <div class="input-group">
+                                    <label>Expiry Date</label>
+                                    <input type="text" id="expiryDate" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="input-group">
+                                    <label>CVV</label>
+                                    <input type="text" id="cvv" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+                            <div class="input-group">
+                                <label>Cardholder Name</label>
+                                <input type="text" id="cardholderName" placeholder="John Doe">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="pay-btn">
+                            <i class="fas fa-lock"></i> Pay Securely
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Tickets Section -->
+            <div id="tickets" class="section">
+                <div class="tickets-header">
+                    <h2>My Parking Tickets</h2>
+                    <p>View and manage your parking tickets</p>
+                </div>
+                <div id="ticketsList" class="tickets-list"></div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile" class="section">
+                <div class="profile-header">
+                    <h2>My Profile</h2>
+                    <p>Manage your account information</p>
+                </div>
+                <div class="profile-container">
+                    <div class="profile-card">
+                        <div class="profile-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <form id="profileForm">
+                            <div class="input-group">
+                                <label>Full Name</label>
+                                <input type="text" id="profileName" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Email Address</label>
+                                <input type="email" id="profileEmail" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Phone Number</label>
+                                <input type="tel" id="profilePhone" required>
+                            </div>
+                            <div class="input-group">
+                                <label>Address</label>
+                                <textarea id="profileAddress" rows="3" placeholder="Enter your address"></textarea>
+                            </div>
+                            <button type="submit" class="update-btn">
+                                <i class="fas fa-save"></i> Update Profile
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="page">
+        <nav class="navbar admin-nav">
+            <div class="nav-brand">
+                <i class="fas fa-shield-alt"></i> SmartPark Admin
+            </div>
+            <div class="nav-menu">
+                <a href="#" onclick="showAdminSection('adminOverview')" class="nav-link active">
+                    <i class="fas fa-chart-bar"></i> Overview
+                </a>
+                <a href="#" onclick="showAdminSection('slotManagement')" class="nav-link">
+                    <i class="fas fa-th-large"></i> Slot Management
+                </a>
+                <a href="#" onclick="showAdminSection('bookingManagement')" class="nav-link">
+                    <i class="fas fa-clipboard-list"></i> Bookings
+                </a>
+                <a href="#" onclick="showAdminSection('userManagement')" class="nav-link">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="#" onclick="showAdminSection('reportsAnalytics')" class="nav-link">
+                    <i class="fas fa-chart-pie"></i> Reports
+                </a>
+                <a href="#" onclick="showAdminSection('maintenance')" class="nav-link">
+                    <i class="fas fa-tools"></i> Maintenance
+                </a>
+                <a href="#" onclick="logout()" class="nav-link">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </a>
+            </div>
+        </nav>
+
+        <div class="admin-container">
+            <!-- Admin Overview -->
+            <div id="adminOverview" class="admin-section active">
+                <div class="admin-header">
+                    <h2>Dashboard Overview</h2>
+                    <p>Real-time parking system statistics</p>
+                </div>
+                
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card">
+                        <i class="fas fa-car"></i>
+                        <div class="stat-info">
+                            <h3 id="totalSlots">100</h3>
+                            <p>Total Slots</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-info">
+                            <h3 id="occupiedSlots">45</h3>
+                            <p>Occupied Slots</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <i class="fas fa-clock"></i>
+                        <div class="stat-info">
+                            <h3 id="todayBookings">28</h3>
+                            <p>Today's Bookings</p>
+                        </div>
+                    </div>
+                    <div class="admin-stat-card">
+                        <i class="fas fa-dollar-sign"></i>
+                        <div class="stat-info">
+                            <h3 id="todayRevenue">$1,250</h3>
+                            <p>Today's Revenue</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="admin-charts">
+                    <div class="chart-container">
+                        <h3>Occupancy Rate</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="occupancyChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <h3>Revenue Trend</h3>
+                        <div class="chart-placeholder">
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slot Management -->
+            <div id="slotManagement" class="admin-section">
+                <div class="admin-header">
+                    <h2>Parking Slot Management</h2>
+                    <button class="add-btn" onclick="showAddSlotModal()">
+                        <i class="fas fa-plus"></i> Add New Slot
+                    </button>
+                </div>
+                <div class="admin-slot-grid" id="adminSlotGrid"></div>
+            </div>
+
+            <!-- Booking Management -->
+            <div id="bookingManagement" class="admin-section">
+                <div class="admin-header">
+                    <h2>Booking Management</h2>
+                    <div class="filter-controls">
+                        <select id="statusFilter">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="completed">Completed</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                        <input type="date" id="dateFilter">
+                    </div>
+                </div>
+                <div class="bookings-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Booking ID</th>
+                                <th>User</th>
+                                <th>Slot</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th>Amount</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookingsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User Management -->
+            <div id="userManagement" class="admin-section">
+                <div class="admin-header">
+                    <h2>User Management</h2>
+                    <div class="search-controls">
+                        <input type="text" id="userSearch" placeholder="Search users...">
+                        <button class="search-btn">
+                            <i class="fas fa-search"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="users-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Total Bookings</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports & Analytics -->
+            <div id="reportsAnalytics" class="admin-section">
+                <div class="admin-header">
+                    <h2>Reports & Analytics</h2>
+                    <div class="report-controls">
+                        <select id="reportType">
+                            <option value="daily">Daily Report</option>
+                            <option value="weekly">Weekly Report</option>
+                            <option value="monthly">Monthly Report</option>
+                        </select>
+                        <button class="generate-btn">
+                            <i class="fas fa-download"></i> Generate Report
+                        </button>
+                    </div>
+                </div>
+                <div class="reports-content">
+                    <div class="report-summary">
+                        <h3>Summary Statistics</h3>
+                        <div class="summary-grid">
+                            <div class="summary-item">
+                                <span>Total Revenue:</span>
+                                <strong>$15,750</strong>
+                            </div>
+                            <div class="summary-item">
+                                <span>Total Bookings:</span>
+                                <strong>842</strong>
+                            </div>
+                            <div class="summary-item">
+                                <span>Average Duration:</span>
+                                <strong>3.2 hours</strong>
+                            </div>
+                            <div class="summary-item">
+                                <span>Peak Hours:</span>
+                                <strong>2:00 PM - 6:00 PM</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Maintenance -->
+            <div id="maintenance" class="admin-section">
+                <div class="admin-header">
+                    <h2>System Maintenance</h2>
+                    <button class="maintenance-btn" onclick="performMaintenance()">
+                        <i class="fas fa-tools"></i> Run Maintenance
+                    </button>
+                </div>
+                <div class="maintenance-content">
+                    <div class="maintenance-logs">
+                        <h3>Maintenance Logs</h3>
+                        <div id="maintenanceLogs" class="logs-container"></div>
+                    </div>
+                    <div class="system-status">
+                        <h3>System Status</h3>
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span>Database:</span>
+                                <span class="status online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Payment Gateway:</span>
+                                <span class="status online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Email Service:</span>
+                                <span class="status online">Online</span>
+                            </div>
+                            <div class="status-item">
+                                <span>Last Backup:</span>
+                                <span>2 hours ago</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content success-modal">
+            <div class="success-animation">
+                <i class="fas fa-check-circle"></i>
+            </div>
+            <h2>Booking Successful!</h2>
+            <p>Your parking slot has been booked successfully.</p>
+            <div class="ticket-preview" id="ticketPreview"></div>
+            <button class="close-success-btn" onclick="closeSuccessModal()">
+                <i class="fas fa-download"></i> Download Ticket
+            </button>
+        </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
