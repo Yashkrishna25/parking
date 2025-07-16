@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - Smart Parking</title>
+    <link rel="stylesheet" href="assets/style.css" />
+  </head>
+  <body>
+    <header>
+      <nav>
+        <a href="index.html">Home</a>
+        <button id="logoutBtn" class="btn" style="float:right;">Logout</button>
+      </nav>
+    </header>
+
+    <div class="container fade-in">
+      <h2>All Bookings</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>User Email</th>
+            <th>Slot</th>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody id="bookingsTableBody"></tbody>
+      </table>
+    </div>
+
+    <script src="assets/script.js"></script>
+  </body>
+</html>
