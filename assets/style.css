@@ -135,3 +135,21 @@ table td {
     transform: translateY(0);
   }
 }
+
+/* Message / alert styles */
+.msg {
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+}
+
+.msg.error {
+  background: #fdecea;
+  color: #d93025;
+}
+
+.msg.success {
+  background: #e6f4ea;
+  color: #188038;
+}
