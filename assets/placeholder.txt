@@ -1,0 +1,1 @@
+Place your icons and images here: icon.png, splash.png, adaptive-icon.png, favicon.png
